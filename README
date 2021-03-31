@@ -1,0 +1,49 @@
+# pSSALib
+
+The pSSAlib provides a complete and concise implementation of the most efficient partial-propensity methods for exact stochastic chemical kinetics.
+
+### Prerequisites
+
+libSBLM is a required component to install pSSAlib. Many linux system today provide binaries for libSBML that can be installed using a package manager, or the respective package can be obtained under http://sbml.org/Software/libSBML
+
+### Installing
+
+To install pSSAlib please untar the package with
+
+tar -xcf pSSAlib_xxx.tar
+
+change directory into the pSSAlib folder and run
+
+./configure
+make
+
+You may want to specify the path to libSBML include files and binaries:
+
+./configure --with-libsbml-include=/the/sbml/include/directory --with-libsbml-lib=/the/sbml/lib/directory
+make
+
+
+## Validation tests
+
+Validation test are automatically compiled in example/validation.
+The Endosome switch example and gray-scott example are provided into the folders
+etl-endosome-switch and gray-scott-2d.
+Aditional examples can be founded in the folder benchmarks.
+
+## Authors
+
+* **Oleksandr Ostrenko **
+* **Pietro Incardona **
+* **Rajesh Ramaswamy **
+* **Ivo Sbalzarini **
+* **Lutz Brush **
+
+## License
+
+This project is licensed under the LGPL 3.0 License
+
+## Acknowledgments
+
+None
+
+

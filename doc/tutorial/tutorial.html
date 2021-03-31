@@ -1,0 +1,652 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Partial-propensity stochastic simulation algorithms library: A Tutorial</title>
+    <link type="text/css" rel="stylesheet" href="media/tutorial.css"/>
+    <script src="https://cdn.rawgit.com/mathjax/MathJax/2.7.1/MathJax.js?config=TeX-MML-AM_SVG"></script>
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [['\\(','\\)']],
+          processClass: "mathjax",
+          ignoreClass: "no-mathjax"
+        }
+      });
+    </script>
+    <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+    <script src="https://cdn.rawgit.com/idiotWu/jQuery-TOC/master/src/toc.js"></script>
+    <script language="javascript">
+    function makeTOC() {
+      var opts = {
+            selector: 'h2, h3, h4, h5, h6',
+            scope: 'body',
+            overwrite: false,
+            prefix: 'toc'
+      };
+    
+      // returns an ordered-list of headers in page content
+      var toc = initTOC(opts);
+      
+      var nav = document.getElementById("toc-placeholder");
+      nav.appendChild(toc);
+      nav.setAttribute('style', 'display:');
+    }
+    </script>
+    
+    <style>
+      .centered-wrapper {
+        margin: 0;
+        padding: 0;
+        padding-top: 10px;
+        text-align: center;
+      }
+      .justified-a4-page {
+        width: 21cm;
+        text-align: justify;
+        border: 0px;
+        padding: 0;
+        margin: 0 auto;
+      }
+      .prettyprint {
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body class="centered-wrapper" class="tex2jax_ignore" onload="makeTOC();">
+  <div class="justified-a4-page">
+
+<!-- PAGE CONTENTS BEGIN -->
+
+<h1 id="title">Partial-propensity stochastic simulation algorithms library</h1>
+
+<nav id="toc-placeholder" class="table-of-contents" style="display:none"></nav>
+
+<p>We give an overview of the partial-propensity stochastic simulation algorithms library (pSSAlib), a complete and portable C++ implementation of all partial-propensity stochastic simulation algorithms (SSAs), complemented with tools for running simulations and analyzing the results.</p>
+<p>For details on the partial propensity methods please refer to the articles in the <a href="#references">References section</a>.</p>
+
+<h2>Download</h2>
+
+<p>You can download the pSSAlib distribution package <a href="http://mosaic.mpi-cbg.de/Downloads/pssalib-2.0.0.tar.gz">here</a>, or use the following command on the terminal (requires <a href="https://www.gnu.org/software/wget/">wget</a>):</p>
+
+<div class="console"><samp>
+<kbd class="shell prompt">~/ $</kbd>
+<kbd class="shell cmd">wget http://mosaic.mpi-cbg.de/Downloads/pssalib-2.0.0.tar.gz</kbd><br/>
+</samp></div>
+
+<p>Then uncompress the archive with the package using (requires <a href="https://www.gnu.org/software/tar/">tar</a>):</p>
+
+<div class="console"><samp>
+<kbd class="shell prompt">~/ $</kbd>
+<kbd class="shell cmd">tar -xf pssalib-2.0.0.tar.gz</kbd><br/>
+</samp></div>
+
+<p>and change the current working directory to the package directory:</p>
+
+<div class="console"><samp>
+<kbd class="shell prompt">~/ $</kbd>
+<kbd class="shell cmd">cd pssalib-2.0.0</kbd><br/>
+<kbd class="shell prompt">~/pssalib-2.0.0 $</kbd>
+<kbd class="shell cmd"> </kbd><br/>
+</samp></div>
+
+<h2>Installation</h2>
+
+<h3>Prerequisites</h3>
+
+<p>A modern compiler (tested with gcc 4.8.0 and clang 3.8.0) with recent implementation of C++ Standard Template Library (STL), the <a href="http://www.gnu.org/software/gsl/">GNU Scientific Library (GSL)</a>, <a href="http://www.boost.org/"><span style="font-weight: normal">Boost C++ Libraries</span></a> (tested with 1.55.0), and the <a href="http://sbml.org/">Systems Biology Markup Language (SBML) C++ library</a> (tested with 5.13.0) are required.</p>
+
+<p>On some platforms the SBML library (libSBML) has to be built from sources.
+Below are sample commands to install these prerequisites:</p>
+
+<ul>
+  <li>
+    <p><strong>Ubuntu 16.04</strong>:
+    <div class="console"><samp>
+    <kbd class="shell prompt">~/pssalib-2.0.0 $</kbd>
+    <kbd class="shell cmd">sudo apt-get install make g++ gsl-bin libgsl0-dev libboost-dev libboost-program-options-dev libxml2-dev libsbml5-dev</kbd><br/></samp></div></p>
+  </li>
+  <li>
+    <p><strong>Fedora 26</strong>:
+    <div class="console"><samp>
+    <kbd class="shell prompt">~/pssalib-2.0.0 $</kbd>
+    <kbd class="shell cmd">dnf install gcc-c++ gsl-devel boost boost-devel libxml2-devel libsbml-devel</kbd><br/></samp></div></p>
+  </li>
+  <li>
+    <p><strong>MacOS X 10.12</strong>:
+    We suggest to use the <a href="https://brew.sh/">brew</a> package manager for building required dependencies.
+    <p class="note">Please ensure that <code>/usr/local</code> is writable by your account!</p>
+    <div class="console"><samp>
+    <kbd class="shell prompt">~/pssalib-2.0.0 $</kbd>
+    <kbd class="shell cmd">brew install gcc gsl boost libxml2 homebrew/science/libsbml</kbd><br/></samp></div></p>
+  </li>
+</ul>
+
+<p class="note">pSSAlib was designed for stock <a href="http://sbml.org/">libSBML</a>, so installing respective packages provided in the software repositories or building with default settings is sufficient.</p>
+
+<h3>Build</h3>
+
+<p>Once all the dependencies are installed, pSSAlib can be configured and built.
+The pSSAlib build system is based on <a href="http://www.gnu.org/software/automake/">GNU Automake</a> (at least version 2.63) and has been tested on several Linux distributions and MacOS X.
+Typically, these are the commands that need to be executed on the console:</p>
+
+<div class="console"><samp>
+<kbd class="shell prompt">~/pssalib-2.0.0 $</kbd>
+<kbd class="shell cmd">./configure</kbd><br/>
+<kbd class="shell prompt">~/pssalib-2.0.0 $</kbd>
+<kbd class="shell cmd">make</kbd><br/>
+</samp></div>
+
+<p>and, optionally, pSSAlib can be installed with:</p>
+
+<div class="console"><samp>
+<kbd class="shell prompt">~/pssalib-2.0.0 $</kbd>
+<kbd class="shell cmd">make install</kbd><br/>
+</samp></div>
+
+<p class="important">On some setups, paths for <a href="http://sbml.org/">libSBML</a> cannot be determined automatically.
+For instance, the default installation path for libSBML library and include files are <code>/usr/local/lib</code> and <code>/usr/local/include</code> respectively, which sometimes is <b>NOT</b> on the compiler search path.
+In this case, please use the respective <code>./configure</code> options: <code>--with-libsbml-libdir</code> and <code>--with-libsbml-include</code> to specify libSBML library and include paths respectively.</br>
+  <strong>Example:</strong><br>
+  <span class="console" style="display: block;"><samp>
+  <kbd class="shell prompt">~/pssalib-2.0.0 $</kbd>
+  <kbd class="shell cmd">./configure --with-libsbml-libdir=&lt;path/to/library/files&gt; --with-libsbml-include=&lt;path/to/include/files&gt;</kbd><br/></samp></span></br>
+Now the path to the libSBML shared library has to be provided to the runtime environment before running the software.
+One can alleviate this requirement by linking pSSAlib to libSBML statically via the <code>--with-libsbml-static</code> option to <code>./configure</code>. The respective dependencies to libSBML have to be provided in the <code>SBML_LDFLAGS</code> environment variable.</p>
+
+<p>After building the binaries, the build system installs the static
+and dynamic libraries under the respective library path.
+In addition, the Command Line Interface (CLI) binaries (the <i>simulator</i> and the <i>analyzer</i>) are
+placed under binaries path.
+Examples and test binaries are not included in the installation process.</p>
+
+<h2>Features and interfaces</h2>
+
+<h3>Overview</h3>
+
+<p>pSSAlib provides 4 SSAs, each of them supports reactions with temporal delays as well as spatiotemporal simulations:</p>
+
+<ul>
+<li>Gillespie’s direct method (DM)</li>
+<li>partial-propensity direct method (PDM)</li>
+<li>sorting partial-propensity direct method (SPDM)</li>
+<li>partial-propensity SSA with Composition-Rejection Sampling (PSSA-CR)</li>
+</ul>
+
+<p>pSSAlib features can be accessed by either (i) direct calls from C++ code using the library’s <a href="#cpp">Application Programming Interface (API)</a> or (ii) using the <a href="#cli">Command Line Interface (CLI)</a>.
+The model can either be loaded from an annotated SBML file or defined dynamically and passed to the library through the API.
+Parameters, including diffusion constants, reaction rates, and time delays are defined as <a href="#sbml-annotation-syntax">annotations</a> in the SBML model.
+Annotations can be either done manually in a text editor or assisted by the <a href="#sbml-toolbox-plugin">pSSAlib plug-in for the SBMLToolbox</a>.</p>
+
+<p>pSSAlib simulations can be performed in parallel using the Message Passing Interface (MPI) library for inter-processor communication on compute clusters.
+Parallel simulations sample individual trajectories on different processors.
+To enable this feature please use the option <code>--with-mpi</code> for the  <code>./configure</code> script.
+MPI parallelism is implemented both for the command-line interface as well as the C++ library.</p>
+
+<p class="important">Each process starts an independent pseudo-random number generator, initialized with the seed:
+<br/><br/>
+<strong>seed = truncated_to_64bit[sha1 (time * process id * rank)]</strong>
+<br/><br/>
+Hence, uncorrelated sampling across all processes can not be guaranteed in general.
+This requires a proper parallel random-number generator, like <a href="http://sprng.org">SPRNG</a>.</p>
+
+<p>Initially, partial-propensity methods supported elementary reactions only.
+These are reactions with 2 or less reacting molecules. 
+However, pSSAlib can simulate certain non-elementary reactions.
+These are supported if the reaction has at most two reactants and one of them has a stoichiometry coefficient equal to one.
+Supported reaction patterns are listed below.</p>
+
+<div class="tex2jax_process">
+\begin{align*}
+\emptyset & \xrightarrow{k} S, \\
+N {S}_{1} & \xrightarrow{k} \ldots, \\
+{S}_{1} + N {S}_{2} & \xrightarrow{k} \ldots, \\
+
+& N = 1, 2, \ldots
+\end{align*}
+</div>
+
+<h3 id="cpp">Sample C++ client: Gray-Scott reaction-diffusion system</h3>
+
+<p>The example below shows how to implement a C++ client for pSSAlib.
+This code is located in the subdirectory <code>examples/gray-scott-2d</code> and implements a spatiotemporal simulator for the Gray-Scott reaction-diffusion system:</p>
+
+<div class="tex2jax_process">
+\begin{align*}
+\emptyset & \xrightarrow{F {k}_{1} {u}^{3}} {S}_{1}, \\
+{S}_{1} & \xrightarrow{F {k}_{1} {u}^{2}} \emptyset, \\
+{S}_{1} + 2 {S}_{2} & \xrightarrow{\hphantom{F} {k}_{1} \hphantom{{u}^{2}}} 3 {S}_{2}, \\
+{S}_{2} & \xrightarrow{k {k}_{1} {u}^{2}} \emptyset, \\
+{S}_{2} & \xrightarrow{F {k}_{1} {u}^{2}} \emptyset, \\
+\end{align*}
+</div>
+
+<p>The following code excerpt also demonstrates the use of dynamic model generation and VTK output formatting.</p>
+
+<h4>Excerpt from <code>examples/gray-scott-2d/main.cpp</code></h4>
+
+<pre class="prettyprint lang-cpp linenums">
+// .. other include statements
+
+#include &quot;PSSA.h&quot;
+
+#include &quot;util/MPIWrapper.h&quot;
+#include &quot;util/FileSystem.h&quot;
+#include &quot;util/ProgramOptionsBase.hpp&quot;
+#include &quot;util/SimulationDataSource.hpp&quot;
+
+/**
+ * @class GrayScott2D
+ * @brief Gary-Scott 2D system
+ */
+class GrayScott2D : public ProgramOptionsBase
+{
+// ... implementation details
+public:
+
+  /**
+   * Generates an SBML model using current parameter values.
+   * @return @true if parser succeeds, @false otherwise.
+   */
+  void generateSBML(pssalib::datamodel::SimulationInfo &amp; simInfo)
+  {
+    // ...
+  }
+
+  /**
+   * Population initializer (see @file typedef.h for argument definition).
+   */
+  static void initialPopulation(pssalib::datamodel::DataModel * ptrData, UINTEGER ** arPtrPopulation, void * grayscott)
+  {
+    GrayScott2D * ptrGS = static_cast&lt;GrayScott2D *&gt;(grayscott);
+    gsl_rng * ptrRNG = gsl_rng_alloc(gsl_rng_default);
+
+    const REAL UHH = ptrGS-&gt;u * GrayScott2D::H * GrayScott2D::H;
+    const UINTEGER NN = // number of points
+    const UINTEGER lo = std::floor(0.375*NN);
+    const UINTEGER hi = std::floor(0.625*NN);
+
+    for(UINTEGER svi = 0; svi &lt; ptrData-&gt;getSubvolumesCount(); ++svi)
+    {
+      REAL r = (REAL)gsl_rng_uniform (ptrRNG);
+
+      UINTEGER a = svi % NN;
+      UINTEGER b = svi / NN;
+
+      if (a &gt; lo &amp;&amp; a &lt; hi &amp;&amp; b &gt; lo &amp;&amp; b &lt; hi)
+      {
+        arPtrPopulation[svi][0] = UHH/2.0 + (0.04*(r-0.5)*UHH + 0.5);
+        arPtrPopulation[svi][1] = UHH/4.0 + (0.02*(r-0.5)*UHH + 0.5);
+      }
+      else
+      {
+        arPtrPopulation[svi][0] = UHH;
+        arPtrPopulation[svi][1] = 0;
+      }
+    }
+    
+    gsl_rng_free(ptrRNG);
+  }
+
+  // Get ids of species in the current model
+  const std::vector&lt;STRING&gt; &amp; getSpeciesIds() const
+  {
+    static std::vector&lt;STRING&gt; ids;
+    if(ids.empty())
+    {
+      ids.push_back(STRING(&quot;S0&quot;));
+      ids.push_back(STRING(&quot;S1&quot;));
+    }
+    return ids;
+  }
+};
+
+// Callback for simulation status reporting
+void progress_callback(UINTEGER a, UINTEGER b, SHORT c, void * /*user*/)
+{
+  static SHORT c_old = std::numeric_limits&lt;SHORT&gt;::max();
+  if(c != c_old)
+  {
+    fprintf(stderr, &quot;Progress: sample %u of %u is %hu%% done\n&quot;, a, b, c);
+    c_old = c;
+  }
+}
+
+// entry point
+int main(int argc, char** argv)
+{
+  PSSALIB_MPI_IO_INIT;
+
+  try
+  {
+    // Temporary stream for trajectory
+    STRINGSTREAM ssTrajectory;
+    // Test case object
+    GrayScott2D grayscott;
+    // Simulation parameters
+    pssalib::datamodel::SimulationInfo simInfo;
+
+    /*
+     * Parse command line arguments and configuration file
+     * ...
+     */
+    
+
+    // generate the model
+    grayscott.generateSBML(simInfo);
+
+    ///////////////////////////////////////
+    // initialize the SimulationInfo object
+ 
+    // number of samples
+    simInfo.unSamplesTotal = 1;
+ 
+    // time - 100 time steps
+    simInfo.dTimeEnd  = // ...
+    simInfo.dTimeStep = simInfo.dTimeEnd / 100.0;
+ 
+    // output all species
+    delete simInfo.pArSpeciesIds;
+    simInfo.pArSpeciesIds = NULL;
+ 
+    // suppress all outputs except the desired ones
+    simInfo.unOutputFlags = pssalib::datamodel::SimulationInfo::ofNone
+      | pssalib::datamodel::SimulationInfo::ofTrajectory;
+ 
+    // redirect streams
+    simInfo.setOutputStreamBuf(pssalib::datamodel::SimulationInfo::ofLog, std::cerr.rdbuf());
+    simInfo.setOutputStreamBuf(pssalib::datamodel::SimulationInfo::ofTrajectory, ssTrajectory.rdbuf());
+ 
+    // set up the domain
+    simInfo.setDims(2, /* ... */);
+    // periodic BCs
+    simInfo.eBoundaryConditions = pssalib::datamodel::detail::BC_Periodic;
+    // custom population initializer
+    simInfo.eInitialPopulation = pssalib::datamodel::detail::IP_UserDefined;
+    simInfo.ptrPopulationInitializer = GrayScott2D::initialPopulation;
+    simInfo.ptrPopulationInitializerUserData = &amp;grayscott;
+ 
+    // create an instance of the simulation engine
+    boost::scoped_ptr&lt;pssalib::PSSA&gt; ptrPSSA(new pssalib::PSSA());
+ 
+    // initialize the call-backs
+//     ptrPSSA-&gt;SetReactionCallback(&amp;reaction_callback, &amp;grayscott);
+    ptrPSSA-&gt;SetProgressCallback(&amp;progress_callback, NULL);
+ 
+    // set the simulation method
+    if(!ptrPSSA-&gt;setMethod(grayscott.getMethod()))
+    {
+      PSSALIB_MPI_CERR_OR_NULL &lt;&lt; &quot;Error : failed to set simulation method &quot;
+        &lt;&lt; pssalib::PSSA::getMethodName(grayscott.getMethod()) &lt;&lt; std::endl;
+      return -126;
+    }
+ 
+    // run the simulation and collect timing information
+    if(ptrPSSA-&gt;run(&amp;simInfo))
+    {
+      // parse the simulation engine output
+      SimulationDataSource sds;
+      if(!sds.load(ssTrajectory))
+      {
+        PSSALIB_MPI_CERR_OR_NULL &lt;&lt; &quot;Could not load trajectory from the data stream!\n&quot;;
+        return -125;
+      }
+      else
+      {
+        // create a VTK output formatter and set it up for the output dataset
+        VTKOutputFormatter fmt(simInfo.getDimsCount(), simInfo.getDims(), grayscott.getSpeciesIds());
+        // ensure output path exists
+        STRING strPath(grayscott.getOutputPath());
+        if(!pssalib::util::makeDir(strPath))
+        {
+          PSSALIB_MPI_CERR_OR_NULL &lt;&lt; &quot;Could not create output path '&quot; &lt;&lt; strPath &lt;&lt; &quot;'\n&quot;;
+          return -124;
+        }
+        // create a file path by concatenating directory path and file name pattern
+        pssalib::util::makeFilePath(strPath, grayscott.getFilePattern(), strPath);
+        // store the resulting dataset
+        if(!sds.store(strPath, fmt))
+        {
+          PSSALIB_MPI_CERR_OR_NULL &lt;&lt; &quot;Could not store trajectory as VTK output to '&quot; &lt;&lt; strPath &lt;&lt; &quot;'\n&quot;;
+          return -123;
+        }
+      }
+    }
+    else
+    {
+      PSSALIB_MPI_CERR_OR_NULL
+        &lt;&lt; &quot;FAILED to simulate '&quot; &lt;&lt; ptrPSSA-&gt;getModelName() &lt;&lt; &quot;' using &quot;
+        &lt;&lt; pssalib::PSSA::getMethodName(grayscott.getMethod()) &lt;&lt; &quot;  ... \n&quot;;
+      return -122;
+    }
+  }
+  catch(...)
+  {
+    // Error handling
+  }
+ 
+  return 0;
+}
+</pre>
+
+<h4>Visualizing simulation results in Paraview</h4>
+
+<p>By specifying model parameters from the command line, one can define different model variants and obtains correspondingly different solutions, here concentration patterns changing over time.
+The movies below represent some of the possible patterns alongside with the command to generate them. Default parameter values are <span class="tex2jax_process">\( F = 0.43 \), \( k = 0.065 \), \( k_{1} = 1 \), \( u = 10^{7} \), \( D_{A} = 8 \times 10^{9} \), \( D_{B} = 4 \times 10^{9} \)</span>.</p>
+
+
+
+<table width="100%">
+  <tr>
+    <td>
+      <div class="console"><samp>
+      <kbd class="shell prompt">~/pssalib-2.0.0/examples/gray-scott-2d/ $</kbd>
+      <kbd class="shell cmd">./grayscott --da 2e7 --db 1e7 --F 0.40 --k 0.060 --u 1e6 </kbd><br/>
+      </samp></div>
+    </td>
+    <td>
+      <div class="console"><samp>
+      <kbd class="shell prompt">~/pssalib-2.0.0/examples/gray-scott-2d/ $</kbd>
+      <kbd class="shell cmd">./grayscott --da 8e7 --db 4e7 --F 0.43 --k 0.066 --u 1e6 </kbd><br/>
+      </samp></div>
+    </td>
+    <td>
+      <div class="console"><samp>
+      <kbd class="shell prompt">~/pssalib-2.0.0/examples/gray-scott-2d/ $</kbd>
+      <kbd class="shell cmd">./grayscott --da 8e7 --db 4e7 --F 0.43 --k 0.069 --u 1e6 </kbd><br/>
+      </samp></div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <video width="100%" controls="controls" autoplay="autoplay" loop="loop">
+      <source src="media/grayscott_alpha.mp4"></source>
+      <source type="video/mp4" src="media/grayscott_alpha.mp4"></source>
+      <source type="video/webm" src="media/grayscott_alpha.webm"></source>
+      <source type="video/ogg" src="media/grayscott_alpha.ogv"></source>
+      </video>
+    </td>
+    <td>
+      <video width="100%" controls="controls" autoplay="autoplay" loop="loop">
+      <source src="media/grayscott_selfsplit.mp4"></source>
+      <source type="video/mp4" src="media/grayscott_selfsplit.mp4"></source>
+      <source type="video/webm" src="media/grayscott_selfsplit.webm"></source>
+      <source type="video/ogg" src="media/grayscott_selfsplit.ogv"></source>
+      </video>
+    </td>
+    <td>
+      <video width="100%" controls="controls" autoplay="autoplay" loop="loop">
+      <source src="media/grayscott_mv.mp4"></source>
+      <source type="video/mp4" src="media/grayscott_mv.mp4"></source>
+      <source type="video/webm" src="media/grayscott_mv.webm"></source>
+      <source type="video/ogg" src="media/grayscott_mv.ogv"></source>
+      </video>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <div class="console"><samp>
+      <kbd class="shell prompt">~/pssalib-2.0.0/examples/gray-scott-2d/ $</kbd>
+      <kbd class="shell cmd">./grayscott --da 2e9 --db 1e9 --F 0.40 --k 0.060 --u 1e7 </kbd><br/>
+      </samp></div>
+    </td>
+    <td>
+      <div class="console"><samp>
+      <kbd class="shell prompt">~/pssalib-2.0.0/examples/gray-scott-2d/ $</kbd>
+      <kbd class="shell cmd">./grayscott --da 8e9 --db 4e9 --F 0.43 --k 0.065 --u 1e7 </kbd><br/>
+      </samp></div>
+    </td>
+    <td>
+      <div class="console"><samp>
+      <kbd class="shell prompt">~/pssalib-2.0.0/examples/gray-scott-2d/ $</kbd>
+      <kbd class="shell cmd">./grayscott --da 8e9 --db 4e9 --F 0.43 --k 0.069 --u 1e7 </kbd><br/>
+      </samp></div>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <video width="100%" controls="controls" autoplay="autoplay" loop="loop">
+      <source src="media/grayscott_alpha7.mp4"></source>
+      <source type="video/mp4" src="media/grayscott_alpha7.mp4"></source>
+      <source type="video/webm" src="media/grayscott_alpha7.webm"></source>
+      <source type="video/ogg" src="media/grayscott_alpha7.ogv"></source>
+      </video>
+    </td>
+    <td>
+      <video width="100%" controls="controls" autoplay="autoplay" loop="loop">
+      <source src="media/grayscott_selfsplit.mp4"></source>
+      <source type="video/mp4" src="media/grayscott_selfsplit7.mp4"></source>
+      <source type="video/webm" src="media/grayscott_selfsplit7.webm"></source>
+      <source type="video/ogg" src="media/grayscott_selfsplit7.ogv"></source>
+      </video>
+    </td>
+    <td>
+      <video width="100%" controls="controls" autoplay="autoplay" loop="loop">
+      <source src="media/grayscott_mv7.mp4"></source>
+      <source type="video/mp4" src="media/grayscott_mv7.mp4"></source>
+      <source type="video/webm" src="media/grayscott_mv7.webm"></source>
+      <source type="video/ogg" src="media/grayscott_mv7.ogv"></source>
+      </video>
+    </td>
+   </tr>
+</table>
+   
+<p>When running the above Gray-Scott example, it will report simulation progress and then output 100 VTK frames of the simulation into the specified directory. These can be visualized using the <a href="http://www.paraview.org/">Paraview</a> software.</p>
+
+<h3 id="cli">Command line interface: heat-shock response in <i>E. coli</i></h3>
+
+<p>Here we demonstrate the application of pSSAlib to a model of age-related impairment of the heat-shock response, showing that efficient simulations enable large sample sizes and that the correspondingly accurate population averages reproduce published results.
+Chaperones play an important role in cell physiology by assisting in proper folding of nascent proteins, refolding of misfolded proteins at elevated temperatures, catalyzing protein degradation in the lysosomes, and preventing protein aggregation.
+However, the amount of damaged protein in a cell increases with cell age, suggesting an impairment of the heat-shock response.
+An SBML model of this system is publicly available from the <a href="http://identifiers.org/biomodels.db/BIOMD0000000091">BioModels Database</a>.
+An annotated version of this model, which is ready to be processed by the CLI, is available in the subdirectory <code>examples/tutorial/</code>.
+To illustrate the CLI, we use the heat-shock response model of an unstressed cell.</p>
+
+<p>We let the simulation engine sample 100 trajectories using SPDM as the simulation algorithm.
+We chose to collect simulation output every 10 s of simulated time.
+The respective CLI call to the simulator reads:</p>
+
+<div class="console"><samp>
+<kbd class="shell prompt">~/pssalib-2.0.0 $</kbd>
+<kbd class="shell cmd">pssa_cli/simulator -m spdm -i examples/tutorial/Proctor2005_annotated_Fig2.xml -n 100 --tend 10000 --dt 10 -o &lt;dataset-path&gt;</kbd><br/></samp></div>
+
+<p>We then use the pSSAlib analyzer to statistically analyze the simulation data and to plot the results.
+We selected the species to be included in the analysis using the <code>-s</code> command-line option followed by the respective species names as a comma-separated list.
+The two calls to the analyzer below serve to plot a single trajectory for the selected
+species by specifying both <code>-n 1</code> and <code>-r trajectories</code>:
+
+<div class="console"><samp>
+<kbd class="shell prompt">~/pssalib-2.0.0 $</kbd>
+<kbd class="shell cmd">pssa_cli/analyzer -m spdm -i &lt;dataset-path&gt; s NatP,MisP,AggP,Hsp90 -n 1 -r trajectories -o &lt;output-path&gt;</kbd><br/>
+<kbd class="shell prompt">~/pssalib-2.0.0 $</kbd>
+<kbd class="shell cmd">pssa_cli/analyzer -m spdm -i &lt;dataset-path&gt; -s ATP,ADP,ROS -n 1 -r trajectories -o &lt;output-path&gt;</kbd><br/></samp></div>
+
+<p>By specifying <code>-i examples/tutorial/Proctor2005_annotated_Fig6.xml</code> and <code>--tend 1e5</code>, the results for Figure 6 from the original publication are reproduced. A list of all supported options can be printed out by specifying the <code>--help</code> option on the command-line.</p>
+
+
+<img src="media/heats.jpg" width="100%" margin="5"/>
+
+<b>Figure illustrating the heat-shock response model.</b>
+Visualization of the simulation results showing time courses for a single cell.
+The heat-shock response of an (<i>a,b</i>) unstressed cell and (<i>c,d</i>) a stressed cell.
+The color code from panel b applies to all panels.
+For the abbreviations of the model variables please refer to the <a href="http://dx.doi.org/10.1016/j.mad.2004.09.031">original publication</a>.
+
+<h2>Custom SBML annotations</h2>
+
+<h3 id="sbml-annotation-syntax">Syntax</h3>
+
+<p>Core SBML as of V4L2 does not support spatial aspects of the system nor the definition of specific probability rates for forward and reverse reactions.
+To accommodate this data in the model file, pSSAlib uses custom annotations in the definitions of <code>Species</code> and <code>Reaction</code> objects.<br/>
+Diffusion is defined by the <code>libpSSA:diffusion</code> annotation object in the definition of each diffusive species. The diffusion constant is defined via the <code>libpSSA:value</code> attribute value, see the example below:</p>
+
+<pre class="prettyprint lang-xml linenums">
+&lt;species compartment=&quot;...&quot; id=&quot;...&quot; initialAmount=&quot;...&quot; name=&quot;...&quot;&gt;
+  &lt;annotation&gt;
+    &lt;libpSSA:diffusion xmlns:libpSSA=&quot;uri&quot; libpSSA:value=&quot;<i style="background-color: orange !important">{value}</i>&quot;/&gt;
+  &lt;/annotation&gt;
+&lt;/species&gt;
+</pre>
+
+Specific probability rates for reactions are also defined in the respective annotations of the <code>Reaction</code> objects.
+Two rates can be defined per object, corresponding to forward and reverse reaction rates (in case of reversible reactions):
+
+<pre class="prettyprint lang-xml linenums">
+&lt;reaction id=&quot;...&quot; reversible=&quot;...&quot;&gt;
+  ...
+  &lt;annotation&gt;
+    &lt;libpSSA:rate xmlns:libpSSA=&quot;uri&quot;&gt;
+      &lt;pSSAlib:forward pSSAlib:value=&quot;<i style="background-color: orange !important">{value}</i>&quot;/&gt;
+      &lt;pSSAlib:reverse pSSAlib:value=&quot;<i style="background-color: orange !important">{value}</i>&quot;/&gt;
+    &lt;/libpSSA:rate&gt;
+  &lt;/annotation&gt;
+&lt;/reaction&gt;
+</pre>
+
+<p>By a similar token, delays are also defined in a separate annotation object.
+Delay type (consuming or non-consuming) is specified as a respective attribute, while the delay value is defined by the <code>libpSSA:value</code> attribute, see the example below:</p>
+
+<pre class="prettyprint lang-xml linenums">
+&lt;reaction id=&quot;...&quot; reversible=&quot;...&quot;&gt;
+  ...
+  &lt;annotation&gt;
+    &lt;libpSSA:delay xmlns:libpSSA=&quot;uri&quot; [pSSAlib:consuming | pSSAlib:nonconsuming ] pSSAlib:value=&quot;<i style="background-color: orange !important">{value}</i>&quot;/&gt;
+  &lt;/annotation&gt;
+&lt;/reaction&gt;
+</pre>
+
+<p>Here <i style="background-color: orange !important">{value}</i> can be either a floating point number, in which case it is treated as a dimensionless quantity, or a string corresponding to a parameter identifier in the SBML model.</p>
+
+<h3 id="sbml-toolbox-plugin">Integration with SBMLToolbox</h3>
+
+<p>In order to facilitate manual editing of reaction rates, reaction delays, and diffusion
+constants, pSSAlib includes a plug-in for the SBMLToolbox.
+For ease of installation, we provide a pre-packaged distribution of the SBMLToolbox for download
+on the pSSAlib website.
+The plug-in is activated seamlessly via the respective menu item and, when active, indicates whether the individual model components (reactions and species) contain valid annotations that can be processed by pSSAlib.
+The plug-in also provides a graphical user interface for editing the respective annotations.
+Reaction annotations contain the reaction rates and time delays with their respective values.
+The plug-in uses a color code to highlight SBML nodes that can be edited, marking a node without annotation with a yellow background, red background for an invalid annotation, and green background for a valid annotation.</p>
+
+<img src="media/sbml_editor.jpg" width="100%" border="0"><br/>
+ 
+<h2 id="references">References</h2>
+<p>Rajesh Ramaswamy, Nelido Gonzalez-Segredo, and Ivo F. Sbalzarini.
+A new class of highly efficient exact stochastic simulation
+algorithms for chemical reaction networks. <em>THE JOURNAL OF
+CHEMICAL PHYSICS</em>, 130, 244104 (2009) (<a href="../Ramaswamy2009.pdf" target="_blank">PDF</a>)</p>
+<p>Rajesh Ramaswamy, and Ivo F. Sbalzarini. A partial-propensity
+variant of the composition-rejection stochastic simulation algorithm
+for chemical reaction networks. <em>THE JOURNAL OF CHEMICAL PHYSICS</em>
+132, 044102 (2010) (<a href="../Ramaswamy2010.pdf" target="_blank">PDF</a>)</p>
+<p>Rajesh Ramaswamy, and Ivo F. Sbalzarini. A partial-propensity
+formulation of the stochastic simulation algorithm for chemical
+reaction networks with delays. <em>THE JOURNAL OF CHEMICAL PHYSICS
+</em>134, 014106 (2011) (<a href="../Ramaswamy2011.pdf" target="_blank">PDF</a>)</p>
+<p>Rajesh Ramaswamy and Ivo F. Sbalzarini. Exact on-lattice
+stochastic reaction-diffusion simulations using partial-propensity
+methods. <em>THE JOURNAL OF CHEMICAL PHYSICS</em>, 135, 244103 (2011)
+(<a href="../Ramaswamy2011c.pdf" target="_blank">PDF</a>)</p>
+
+<!-- PAGE CONTENTS END -->
+
+</div></body></html>

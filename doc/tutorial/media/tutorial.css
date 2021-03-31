@@ -1,0 +1,76 @@
+/* adapted from https://stackoverflow.com/questions/43317395/copypasteable-console-output-with-html-css-javascript */
+
+.console {
+  background-color: black !important;
+  font-family: monospace;
+/*   width: 60em; */
+}
+.shell {
+  word-break: break-all;
+  white-space:pre-wrap;
+  display:inline;
+}
+.prompt {
+  font-weight: bold;
+  color: green;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.cmd {
+  color: white;
+}
+.output {
+  color: gray;
+}
+
+/* Adapted from http://www.madcapsoftware.com/blog/2013/05/06/ready-for-review-css-tip-creating-tip-or-note-boxes-without-a-div-or-table/ */
+
+p.note
+{
+     color: #616E14;
+     border: solid 1px #BFD62F;
+     background-color: #DAE691;
+     -moz-border-radius: 6px;
+     -webkit-border-radius: 6px;
+     border-radius: 6px;
+     padding: 14px 20px;
+}
+
+p.important
+{
+  color: #616E14;
+  border: solid 1px #F44336;
+  background-color: #FFDDDD;
+  -moz-border-radius: 6px;
+  -webkit-border-radius: 6px;
+  border-radius: 6px;
+  padding: 14px 20px;
+}
+
+/* TOC */
+
+.table-of-contents {
+  float: right;
+  width: 40%;
+  background: #eee;
+  font-size: 0.8em;
+  padding: 1em 2em;
+  margin: 0 0 0.5em 0.5em;
+}
+.table-of-contents ul {
+  padding: 0;
+}
+.table-of-contents li {
+  margin: 0 0 0.25em 0;
+}
+.table-of-contents a {
+  text-decoration: none;
+}
+.table-of-contents a:hover,
+.table-of-contents a:active {
+  text-decoration: underline;
+}
