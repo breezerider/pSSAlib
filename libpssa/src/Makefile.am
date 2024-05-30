@@ -37,3 +37,4 @@ util/FileSystem.cpp
 libpssa_la_CFLAGS = -DUNIX -rdynamic $(GSL_CFLAGS) $(SBML_CPPFLAGS) $(BOOST_CPPFLAGS)
 libpssa_la_CXXFLAGS = -DUNIX -rdynamic $(GSL_CFLAGS) $(SBML_CPPFLAGS) $(BOOST_CPPFLAGS)
 libpssa_la_LIBADD = $(LINKLIBS)
+libpssa_la_LDFLAGS = -version-info "@CURRENT@:@REVISION@:@AGE@"
