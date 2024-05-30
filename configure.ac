@@ -2,15 +2,15 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.59)
-AC_INIT(pSSAlib, 2.0.0, incardon@mpi-cbg.de)
+AC_PREREQ([2.69])
+AC_INIT([pSSAlib],[2.0.0],[incardon@mpi-cbg.de])
 AC_USE_SYSTEM_EXTENSIONS
 AC_CONFIG_MACRO_DIR([m4])
 LT_INIT()
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 AC_CONFIG_SRCDIR([libpssa/include/])
 AM_INIT_AUTOMAKE
-AC_CONFIG_HEADER([libpssa/include/config.h])
+AC_CONFIG_HEADERS([libpssa/include/config.h])
 
 AC_PROG_INSTALL
 
@@ -53,10 +53,8 @@ CXXFLAGS="$CXXFLAGS"
 AC_MSG_CHECKING(whether to build with debug support)
 debug_build=no
 AC_ARG_ENABLE(debug,
-  AC_HELP_STRING(
-    [--enable-debug@<:@=ARG@:>@],
-    [enable debug mode, can be one of: "info" - add "-g3" to CFLAGS (default), "full" - "info" + enable debug output and disable compiler code optimisation, "engine" - "full" + debug the simulation engine]
-  ),
+  AS_HELP_STRING([--enable-debug@<:@=ARG@:>@],[enable debug mode, can be one of: "info" - add "-g3" to CFLAGS (default), "full" - "info" + enable debug output and disable compiler code optimisation, "engine" - "full" + debug the simulation engine
+  ]),
   debug_build="$enableval"
 )
 
@@ -88,7 +86,7 @@ esac
 AC_MSG_CHECKING(whether to build the CLI)
 build_cli=yes
 AC_ARG_ENABLE([cli],
-  AC_HELP_STRING([--disable-cli],[build without the command line interface]),
+  AS_HELP_STRING([--disable-cli],[build without the command line interface]),
   [build_cli="$enableval"],
   [build_cli="yes"]
 )
