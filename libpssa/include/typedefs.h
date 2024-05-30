@@ -126,6 +126,12 @@ typedef std::basic_filebuf< STRING::value_type >      FILESTREAMBUFFER;
 
 typedef boost::basic_format< STRING::value_type >     BOOSTFORMAT;
 
+#ifdef __USE_GOOGLE_HASH_MAP
+  #define HASHMAP google::dense_hash_map
+#else
+  #define HASHMAP std::unordered_map
+#endif
+
 // getpid
 #if defined(_WIN32)
   #define GETPID _getpid

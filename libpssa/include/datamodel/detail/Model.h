@@ -32,7 +32,7 @@ namespace detail
   class Reaction;
   class SBMLHelper;
 
-  typedef boost::unordered_map <STRING, UINTEGER> MAP_ID2IDX;
+  typedef HASHMAP <STRING, UINTEGER> MAP_ID2IDX;
 
   /**
    * @class Model

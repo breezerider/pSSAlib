@@ -65,7 +65,8 @@
 // STL
 #include <algorithm>  // STL algorithms
 #include <vector>     // STL vector container
-#include <memory>    // STL C-style pointer wrapper
+#include <memory>     // STL C-style pointer wrapper
+#include <atomic>     // STL atomic definitions
 
 // libSBML
 #ifdef HAVE_LIBSBML
@@ -82,16 +83,13 @@
 
 #ifdef __USE_GOOGLE_HASH_MAP
   #include <google/dense_hash_map>
-  #define HASHMAP google::dense_hash_map
-#else
-  #define HASHMAP boost::unordered_map
 #endif
 
 // Boost headers
 #include <boost/config.hpp>
 #include <boost/format.hpp>
 #include <boost/lexical_cast.hpp>
-#include <boost/unordered_map.hpp>
+// #include <boost/unordered_map.hpp>
 #include <boost/current_function.hpp>
 // #include <boost/array.hpp>
 // #include <boost/iostreams/filtering_stream.hpp>

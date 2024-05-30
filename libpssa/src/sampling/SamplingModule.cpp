@@ -43,9 +43,9 @@ namespace sampling
 #ifdef HAVE_MPI
       int rank = 0;
       MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-      seed *= boost::hash_value<int>(++rank);
+      seed *= std::hash<int>()(++rank);
 #endif
-      seed *= boost::hash_value<std::clock_t>(std::clock());
+      seed *= std::hash<std::clock_t>()(std::clock());
 
       gsl_rng_set(m_ptrRNG, seed);
     }
