@@ -33,7 +33,7 @@
 #endif
 
 #include <boost/array.hpp>
-#include <boost/math/special_functions/next.hpp>
+// #include <boost/math/special_functions/next.hpp>
 
 namespace pssalib
 {

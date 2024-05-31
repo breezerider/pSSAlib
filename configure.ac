@@ -26,6 +26,7 @@ m4_ifdef([AX_BOOST_PROGRAM_OPTIONS],,[m4_include([m4/ax_boost_program_options.m4
 m4_ifdef([AX_PATH_GSL],,[m4_include([m4/gsl.m4])])
 m4_ifdef([ACX_MPI],,[m4_include([m4/acx_mpi.m4])])
 m4_ifdef([AX_LIBSBML],,[m4_include([m4/libsbml.m4])])
+m4_ifdef([AX_CXX_COMPILE_STDCXX],,[m4_include([m4/ax_cxx_compile_stdcxx.m4])])
 
 # check for doxygen support
 
@@ -132,6 +133,7 @@ AC_MSG_RESULT($no_opts)
 
 AC_PROG_CXX
 AC_LANG_PUSH([C++])
+AX_CXX_COMPILE_STDCXX(11, ext, optional)
 if test "x$use_mpi" = "xyes"; then
   ACX_MPI([AC_DEFINE([HAVE_MPI],[],[Use MPI])],[AC_MSG_ERROR([MPI headers not found])])
 fi
@@ -416,6 +418,7 @@ AC_OUTPUT
 echo ""
 echo " Compiler flags: "
 echo ""
+echo " CXX = \"$CXX\" "
 echo " CFLAGS = \"$CFLAGS\" "
 echo " CXXFLAGS = \"$CXXFLAGS\" "
 echo " LDFLAGS = \"$LDFLAGS\" "

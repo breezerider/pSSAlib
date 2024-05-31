@@ -63,10 +63,11 @@
 #include <gsl/gsl_const_num.h> // Avogadro's Number
 
 // STL
-#include <algorithm>  // STL algorithms
-#include <vector>     // STL vector container
-#include <memory>     // STL C-style pointer wrapper
-#include <atomic>     // STL atomic definitions
+#include <algorithm>      // STL algorithms
+#include <vector>         // STL vector container
+#include <memory>         // STL C-style pointer wrapper
+#include <atomic>         // STL atomic definitions
+#include <unordered_map>  // STL unordered map
 
 // libSBML
 #ifdef HAVE_LIBSBML
