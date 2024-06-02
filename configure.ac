@@ -52,7 +52,7 @@ CXXFLAGS="$CXXFLAGS"
 # # #
 
 
-# Check for debug compilation
+# Check if debug support is requested
 
 AC_MSG_CHECKING(whether to build with debug support)
 debug_build=no
@@ -63,27 +63,21 @@ AC_ARG_ENABLE(debug,
 )
 
 AC_MSG_RESULT($debug_build)
-case "${debug_build}" in
-  engine)
-    AC_DEFINE([PSSALIB_ENGINE_CHECK],[],[Debug engine])
-    ;;&
-  engine | full)
-    AC_DEFINE([DEBUG],[],[Debug])
-    AC_DEFINE([_DEBUG],[],[Debug])
-#    CFLAGS=$(echo "$CFLAGS" | sed "s/-O\?[[0-9]]//g")
-#    CXXFLAGS=$(echo "$CXXFLAGS" | sed "s/-O\?[[0-9]]//g")
-    CFLAGS="$CFLAGS -O0 "
-    CXXFLAGS="$CXXFLAGS -O0 "
-    ;;&
-  engine | full | yes | info )
-#    CFLAGS=$(echo "$CFLAGS" | sed "s/-g\?[[0-9]]//g")
-#    CXXFLAGS=$(echo "$CXXFLAGS" | sed "s/-g\?[[0-9]]//g")
-    CFLAGS="$CFLAGS -g3"
-    CXXFLAGS="$CXXFLAGS -g3"
-    LDFLAGS="$LDFLAGS -g3"
-    ;;
-esac
 
+if test "x$debug_build" = "xengine"; then
+  AC_DEFINE([PSSALIB_ENGINE_CHECK],[],[Debug engine])
+fi
+if test "x$debug_build" = "xengine" || test "x$debug_build" = "xfull" ; then
+  AC_DEFINE([DEBUG],[],[Debug])
+  AC_DEFINE([_DEBUG],[],[Debug])
+  CFLAGS="$CFLAGS -O0 "
+  CXXFLAGS="$CXXFLAGS -O0 "
+fi
+if test "x$debug_build" = "xengine" || test "x$debug_build" = "xfull" || test "x$debug_build" = "xinfo" || test "x$debug_build" = "xyes"; then
+  CFLAGS="$CFLAGS -g3"
+  CXXFLAGS="$CXXFLAGS -g3"
+  LDFLAGS="$LDFLAGS -g3"
+fi
 
 # Check whether to build CLI
 
