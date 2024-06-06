@@ -88,7 +88,7 @@ namespace datamodel
     , eInitialPopulation(detail::IP_Invalid)
     , ptrPopulationInitializer(NULL)
     , ptrPopulationInitializerUserData(NULL)
-    , ptrarRawTrajectory(NULL)
+    , ptrarRawPopulations(NULL)
     , bInterruptRequested(false)
   {
     memset(m_arPtrFileBuffers, 0, 7*sizeof(FILESTREAMBUFFER *));
@@ -123,7 +123,7 @@ namespace datamodel
     , eInitialPopulation(right.eInitialPopulation)
     , ptrPopulationInitializer(right.ptrPopulationInitializer)
     , ptrPopulationInitializerUserData(right.ptrPopulationInitializerUserData)
-    , ptrarRawTrajectory(right.ptrarRawTrajectory)
+    , ptrarRawPopulations(right.ptrarRawPopulations)
     , bInterruptRequested(right.bInterruptRequested.load())
   {
     setDims(right.m_uDims, right.m_arunDims);
@@ -497,13 +497,14 @@ namespace datamodel
       if(NULL != m_ptrOutputLine) delete [] m_ptrOutputLine;
       m_ptrOutputLine = NULL;
     }
-    if(isLoggingOn(ofRawTrajectory))
-      m_ptrRawTrajectory = ptrarRawTrajectory;
-    else
-      m_ptrRawTrajectory = NULL;
     m_unOutputIdx = 0;
     m_unOutputMax = timing::getNumTimePoints(dTimeStart, dTimeEnd, dTimeStep);
     if(m_unOutputMax > 0) --m_unOutputMax;
+
+    if(isLoggingOn(ofRawTrajectory))
+      m_ptrRawTrajectory = ptrarRawPopulations + m_unSampleCurrent * m_unOutputMax * m_arSpeciesIdx.size() * m_ptrPSSA->ptrData->getSubvolumesCount();
+    else
+      m_ptrRawTrajectory = NULL;
 
     // reset the timing
     dTimeSimulation = 0.0;
@@ -783,6 +784,8 @@ PSSA_TRACE(this, << "Total output lines = " << m_unOutputIdx + unTemp << "\n\n\n
               size_t szSpeciesNum = strlen(cBuf.c_array());
               strncpy(pCurrOL, cBuf.c_array(), szSpeciesNum);
               pCurrOL += szSpeciesNum;
+            } else {
+              pCurrPop++;
             }
           }
         }

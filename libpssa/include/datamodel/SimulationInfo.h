@@ -79,12 +79,13 @@ namespace datamodel
       ofTrajectory=0x0040, //!<Output trajectories
       ofRawTrajectory=0x0080, //!<Output raw trajectories
       ofFinalPops=0x0100,  //!<Output data for PDFs
-      ofTimePoints=0x0200, //!<Output time points
-      ofTiming=0x0400,     //!<Output timing
-      ofSpeciesIDs=0x0800, //!<Output species ids
-      ofMaskFile=0x0FF0,   //!<All file output flags
+      ofRawFinalPops=0x0200, //!<Output raw data for PDFs
+      ofTimePoints=0x0400, //!<Output time points
+      ofTiming=0x0800,     //!<Output timing
+      ofSpeciesIDs=0x1000, //!<Output species ids
+      ofMaskFile=0x1FF0,   //!<All file output flags
 
-      ofMaskAll=0x0FFF,    //!<All output flags
+      ofMaskAll=0x1FFF,    //!<All output flags
 
       // extended output flags
       eofModuleGrouping=0x10000,
@@ -187,7 +188,7 @@ namespace datamodel
     void                           *ptrPopulationInitializerUserData;
 
     //! Pointer to raw trajectory storage
-    UINTEGER                       *ptrarRawTrajectory;
+    UINTEGER                       *ptrarRawPopulations;
 
 #ifdef BOOST_NO_CXX11_HDR_ATOMIC
     //! Atomic flag to interrupt execution

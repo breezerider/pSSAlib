@@ -351,7 +351,8 @@ namespace pssalib
     static std::stringstream ssTemp;
 
     boost::scoped_array<TimingInfo> arTiming(NULL);
-    boost::scoped_array<INTEGER> arFinalPops(NULL);
+    boost::scoped_array<UINTEGER> arFinalPops(NULL);
+    UINTEGER *ptrarFinalPops;
 
     PSSA_INFO(ptrSimInfo, << "# of species ids in simulation output "
       << ptrSimInfo->m_arSpeciesIdx.size() << ".\n");
@@ -471,13 +472,16 @@ namespace pssalib
       {
         arFinalPops.reset(
 #ifdef HAVE_MPI
-          (INTEGER*)getMPIWrapperInstance().
+          (UINTEGER*)getMPIWrapperInstance().
             spread_alloc(ptrSimInfo,
-                        sizeof(INTEGER)*ptrData->getSubvolumesCount()*ptrSimInfo->m_arSpeciesIdx.size())
+                        sizeof(UINTEGER)*ptrData->getSubvolumesCount()*ptrSimInfo->m_arSpeciesIdx.size())
 #else
-          new INTEGER[ptrSimInfo->unSamplesTotal*ptrData->getSubvolumesCount()*ptrSimInfo->m_arSpeciesIdx.size()]
+          new UINTEGER[ptrSimInfo->unSamplesTotal*ptrData->getSubvolumesCount()*ptrSimInfo->m_arSpeciesIdx.size()]
 #endif
                 );
+        ptrarFinalPops = arFinalPops.get();
+      } else if (ptrSimInfo->isLoggingOn(datamodel::SimulationInfo::ofRawFinalPops)) {
+        ptrarFinalPops = ptrSimInfo->ptrarRawPopulations;
       }
     }
     catch(std::bad_alloc & e)
@@ -577,7 +581,7 @@ namespace pssalib
           // is the simulation still running?
           if(!ptrSimInfo->isRunning())
             break; // exit the loop silently
-          else 
+          else
           {
             bResult = false; // fail
             break;
@@ -619,12 +623,12 @@ namespace pssalib
       // Store simulation results
 
       // Store the population at final time point
-      if(ptrSimInfo->isLoggingOn(datamodel::SimulationInfo::ofFinalPops))
+      if(ptrSimInfo->isLoggingOn(datamodel::SimulationInfo::ofFinalPops)||ptrSimInfo->isLoggingOn(datamodel::SimulationInfo::ofRawFinalPops))
       {
         for(UINTEGER svi = 0; svi < ptrData->getSubvolumesCount(); svi++) {
           datamodel::detail::Subvolume & subvol = ptrData->getSubvolume(svi);
           for(UINTEGER i = 0; i < ptrSimInfo->m_arSpeciesIdx.size(); i++) {
-            arFinalPops[(n_it*ptrData->getSubvolumesCount() + svi)*ptrSimInfo->m_arSpeciesIdx.size() + i] =
+            ptrarFinalPops[(n_it*ptrData->getSubvolumesCount() + svi)*ptrSimInfo->m_arSpeciesIdx.size() + i] =
               subvol.population(ptrSimInfo->m_arSpeciesIdx[i]);
           }
         }
@@ -734,16 +738,16 @@ namespace pssalib
     if(ptrSimInfo->isLoggingOn(datamodel::SimulationInfo::ofFinalPops))
     {
       PSSA_INFO(ptrSimInfo, << "collecting final populations\n");
-      INTEGER *arCumFinalPops = NULL;
+      UINTEGER *arCumFinalPops = NULL;
 #ifdef HAVE_MPI
       bool bFinalPopsOK = true;
-      if(getMPIWrapperInstance().spread_collect(ptrSimInfo, arFinalPops.get(),
-        (void **)&arCumFinalPops, sizeof(INTEGER)*ptrData->getSubvolumesCount()*ptrSimInfo->m_arSpeciesIdx.size()))
+      if(getMPIWrapperInstance().spread_collect(ptrSimInfo, ptrarFinalPops,
+        (void **)&arCumFinalPops, sizeof(UINTEGER)*ptrData->getSubvolumesCount()*ptrSimInfo->m_arSpeciesIdx.size()))
       {
         if(getMPIWrapperInstance().isMaster())
         {
 #else
-          arCumFinalPops = arFinalPops.get();
+          arCumFinalPops = ptrarFinalPops;
 #endif
           std::ostream & osLocal = ptrSimInfo->getOutputStream(datamodel::SimulationInfo::ofFinalPops);
           if(!osLocal.good())
