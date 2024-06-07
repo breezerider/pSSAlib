@@ -42,9 +42,12 @@ namespace update
   // Methods
 
   //! Update reaction propensities
-  bool UpdateModule_DM::updateSpeciesStructures(pssalib::datamodel::DataModel_DM * ptrDMData, pssalib::datamodel::detail::Subvolume_DM & DMSubVol)
+  bool UpdateModule_DM::updateSpeciesStructures(pssalib::datamodel::SimulationInfo * ptrSimInfo,
+                                                pssalib::datamodel::DataModel_DM * ptrDMData,
+                                                pssalib::datamodel::detail::Subvolume_DM & DMSubVol)
   {
     DMSubVol.dTotalPropensity = 0.0;
+
     // Recalculate the propensity array
     for(UINTEGER rwi = 0; rwi < ptrDMData->getReactionWrappersCount(); ++rwi)
     {
@@ -52,6 +55,8 @@ namespace update
         ptrDMData->getReactionWrapper(rwi);
 
       DMSubVol.propensity(rwi) = 0.0;
+
+      PSSA_TRACE(ptrSimInfo,  << "updating reaction index " << rwi << std::endl);
 
       // compute reaction propensity
       REAL temp = rw.getRate();
@@ -65,7 +70,9 @@ namespace update
         for(UINTEGER ri = 0; ri < rw.getReactantsCount(); ++ri)
         {
           const pssalib::datamodel::detail::SpeciesReference * sr = rw.getReactantsListAt(ri);
-          temp *= pssalib::util::getPartialCombinationsHeteroreactions(DMSubVol.population(sr->getIndex()), sr->getStoichiometryAbs());
+          PSSA_TRACE(ptrSimInfo, << "updating species index " << sr->getIndex() << " with stoichiometry " << sr->getStoichiometryAbs() << std::endl);
+          if(!sr->isReservoir())
+            temp *= pssalib::util::getPartialCombinationsHeteroreactions(DMSubVol.population(sr->getIndex()), sr->getStoichiometryAbs());
         }
       }
 
@@ -79,11 +86,11 @@ namespace update
 
   bool UpdateModule_DM::updateSpeciesStructuresReaction(pssalib::datamodel::SimulationInfo * ptrSimInfo)
   {
-    pssalib::datamodel::DataModel_DM* ptrDMData = 
+    pssalib::datamodel::DataModel_DM* ptrDMData =
       static_cast<pssalib::datamodel::DataModel_DM * >
         (ptrSimInfo->getDataModel());
 
-    return updateSpeciesStructures(ptrDMData, ptrDMData->getSubvolume(ptrDMData->nu));
+    return updateSpeciesStructures(ptrSimInfo, ptrDMData, ptrDMData->getSubvolume(ptrDMData->nu));
   }
 
   bool UpdateModule_DM::updateSpeciesStructuresDiffusion(pssalib::datamodel::SimulationInfo * ptrSimInfo)
@@ -91,8 +98,8 @@ namespace update
     pssalib::datamodel::DataModel_DM* ptrDMData = 
       static_cast<pssalib::datamodel::DataModel_DM * >
         (ptrSimInfo->getDataModel());
-    return updateSpeciesStructures(ptrDMData, ptrDMData->getSubvolume(ptrDMData->nu)) &&
-      updateSpeciesStructures(ptrDMData, ptrDMData->getSubvolume(ptrDMData->nu_D));
+    return updateSpeciesStructures(ptrSimInfo, ptrDMData, ptrDMData->getSubvolume(ptrDMData->nu)) &&
+      updateSpeciesStructures(ptrSimInfo, ptrDMData, ptrDMData->getSubvolume(ptrDMData->nu_D));
   }
 
 }  } // close namespaces pssalib and update

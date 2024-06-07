@@ -62,7 +62,8 @@ virtual bool updateSpeciesStructuresReaction(pssalib::datamodel::SimulationInfo 
 virtual bool updateSpeciesStructuresDiffusion(pssalib::datamodel::SimulationInfo * ptrSimInfo);
 
     //! Update data structures
-    bool updateSpeciesStructures(pssalib::datamodel::DataModel_DM * ptrDMData,
+    bool updateSpeciesStructures(pssalib::datamodel::SimulationInfo * ptrSimInfo,
+                                 pssalib::datamodel::DataModel_DM * ptrDMData,
                                  pssalib::datamodel::detail::Subvolume_DM & DMSubVol);
   };
 
