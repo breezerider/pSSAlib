@@ -636,7 +636,7 @@ int main(int argc, char** argv)
         {
           if(!(m & validation.getMethods()))
             continue;
-          os << pssalib::PSSA::getMethodName((pssalib::PSSA::EMethod)m) << ",";
+          os << pssalib::PSSA::getMethodName((pssalib::PSSA::EMethod)m) << "_avg," << pssalib::PSSA::getMethodName((pssalib::PSSA::EMethod)m) << "_sd,";
         }
         os << '\n';
 
