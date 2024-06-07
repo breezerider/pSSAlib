@@ -40,8 +40,8 @@ namespace datamodel
     // Default constructor
     DataModel_DM();
 
-//     // Copy constructor
-//     DataModel_DM(DataModel &);
+    //! Copy constructor
+    DataModel_DM(DataModel &) = delete;
 
     // Destructor
   virtual ~DataModel_DM();
@@ -61,15 +61,6 @@ namespace datamodel
         new detail::Subvolume_DM);
     };
 
-//     /**
-//      * @copydoc DataModel::freeSubvolumes()
-//      */
-// virtual void freeSubvolumes()
-//       throw(std::bad_alloc)
-//     {
-//       delete [] static_cast<detail::Subvolume_DM *>(arSubvolumes);
-//     };
-// 
   /////////////////////////////////////
   // Methods
   public:
@@ -96,6 +87,9 @@ namespace datamodel
 #endif
       return static_cast<detail::Subvolume_DM &>(*(m_arSubvolumes[unSubvolumeIdx]));
     };
+
+    //! Assignement operator
+    DataModel_DM& operator= (const DataModel_DM&) = delete;
   };
 }  } // close namespaces pssalib and datamodel
 

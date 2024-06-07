@@ -96,7 +96,7 @@ namespace datamodel
     DataModel_PDM();
 
     //! Copy constructor
-    DataModel_PDM(DataModel &);
+    DataModel_PDM(const DataModel_PDM&) = delete;
 
     //! Destructor
   virtual ~DataModel_PDM();
@@ -163,6 +163,9 @@ namespace datamodel
 #endif
       return static_cast<detail::Subvolume_PDM &>(*(m_arSubvolumes[unSubvolumeIdx]));
     };
+
+    //! Assignement operator
+    DataModel_PDM& operator= (const DataModel_PDM&) = delete;
 
   ////////////////////////////////
   // Attributes

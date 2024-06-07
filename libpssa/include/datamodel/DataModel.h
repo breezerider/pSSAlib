@@ -129,8 +129,8 @@ namespace datamodel
     // Default constructor
     DataModel();
 
-//     // Copy constructor
-//     DataModel(DataModel &);
+    //! Copy constructor
+    DataModel(DataModel &) = delete;
 
     // Destructor
   virtual ~DataModel();
@@ -177,24 +177,6 @@ namespace datamodel
       m_unSubvolumes = 0;
       m_arSubvolumes = NULL;
     };
-
-//     /**
-//      * @internal Allocate the subvolume containers.
-//      * 
-//      * @param n Total number of subvolumes required.
-//      * @return Pointer to the allocated subvolume array.
-//      */
-//     template< typename T >
-// inline T * internalAllocateSubvolumes(std::size_t n) const
-//     {
-//       T * t = inplace_alloc<T>(n);
-//       for(std::size_t i = 0; i < n; ++i)
-//       {
-//         new (t + i) T(*this);
-//       }
-//       m_unSubvolumes = n;
-//       return t;
-//     };
 
   /////////////////////////////////////
   // Methods
@@ -393,6 +375,9 @@ namespace datamodel
      * @return The output stream
      */
     std::ostream & printReactionNetwork(std::ostream & os) const;
+
+    //! Assignement operator
+    DataModel& operator= (const DataModel&) = delete;
 
   ////////////////////////////////
   // Attributes

@@ -43,8 +43,8 @@ namespace datamodel
     // Default constructor
     DataModel_PSSACR();
 
-    // Copy constructor
-    DataModel_PSSACR(DataModel &);
+    //! Copy constructor
+    DataModel_PSSACR (const DataModel_PSSACR&) = delete;
 
     // Destructor
   virtual ~DataModel_PSSACR();
@@ -98,6 +98,9 @@ namespace datamodel
 #endif
       return static_cast<detail::Subvolume_PSSACR &>(*(m_arSubvolumes[unSubvolumeIdx]));
     };
+
+    //! Assignement operator
+    DataModel_PSSACR& operator= (const DataModel_PSSACR&) = delete;
 
   };
 }  } // close namespaces pssalib and datamodel

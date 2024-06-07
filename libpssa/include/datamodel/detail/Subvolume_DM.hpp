@@ -115,7 +115,7 @@ namespace detail
     {
 #ifndef PSSALIB_NO_BOUNDS_CHECKS
       if(index >= unReactions)
-        throw std::runtime_error("DataModel::getSubvolume() - invalid arguments.");
+        throw std::runtime_error("Subvolume_DM::propensity() - invalid arguments.");
 #endif
       return ardPi[index];
     }

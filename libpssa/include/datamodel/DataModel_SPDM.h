@@ -41,8 +41,8 @@ namespace datamodel
     // Default constructor
     DataModel_SPDM();
 
-    // Copy constructor
-    DataModel_SPDM(DataModel &);
+    //! Copy constructor
+    DataModel_SPDM(DataModel &) = delete;
 
     // Destructor
   virtual ~DataModel_SPDM();
@@ -96,6 +96,9 @@ namespace datamodel
 #endif
       return static_cast<detail::Subvolume_SPDM &>(*(m_arSubvolumes[unSubvolumeIdx]));
     };
+
+    //! Assignement operator
+    DataModel_SPDM& operator= (const DataModel_SPDM&) = delete;
 
   ////////////////////////////////
   // Attributes

@@ -47,26 +47,6 @@ namespace pssalib
       // Do nothing
     }
 
-//     //! Copy constructor
-//     //! All arrays get detached from source
-//     //! & are reattached to this instance
-//     DataModel::DataModel(DataModel &d)
-//       : strModelName(d.strModelName)
-//       , m_unSpecies(d.m_unSpecies)
-//       , arunDiffSpIdx(d.arunDiffSpIdx)
-//       , m_unReactions(d.m_unReactions)
-//       , arReactionClass(d.arReactionClass)
-//       , ardDelay(d.ardDelay)
-//       , dTotalPropensity(d.dTotalPropensity)
-//       , arU(d.arU), arUp(d.arUp), arUm(d.arUm)
-//       , m_unSubvolumes(d.m_unSubvolumes)
-//       , unNeighboringSubvols(d.unNeighboringSubvols)
-//       , m_arSubvolumes(d.m_arSubvolumes)
-//       , unMiddleVolumeIx(d.unMiddleVolumeIx)
-//     {
-//       // Do nothing
-//     }
-
     //! Destructor
     DataModel::~DataModel()
     {
@@ -365,15 +345,6 @@ namespace pssalib
       // Do nothing
     }
 
-//     //! Copy constructor
-//     //! All arrays get detached from source
-//     //! & are attached to this instance
-//     DataModel_DM::DataModel_DM(DataModel &d)
-//       : DataModel(d)
-//     {
-//       // Do nothing
-//     }
-
     //! Destructor
     DataModel_DM::~DataModel_DM()
     {
@@ -388,15 +359,6 @@ namespace pssalib
     {
       // Do nothing
     }
-
-//     //! Copy constructor
-//     //! All arrays get detached from source
-//     //! & are attached to this instance
-//     DataModel_PDM::DataModel_PDM(DataModel &d)
-//       : DataModel(d)
-//     {
-//       // Do nothing
-//     }
 
     //! Destructor
     DataModel_PDM::~DataModel_PDM()
@@ -415,18 +377,6 @@ namespace pssalib
       // Do nothing
     }
 
-//     //! Copy constructor
-//     //! All arrays get detached from source
-//     //! & are attached to this instance
-//     DataModel_SPDM::DataModel_SPDM(DataModel &d)
-//       : DataModel_PDM(d)
-//       , arSubvolumes_SPDM(NULL)
-//       , uI(0)
-//       , uJ(0)
-//     {
-//       // Do nothing
-//     }
-
     //! Destructor
     DataModel_SPDM::~DataModel_SPDM()
     {
@@ -441,16 +391,6 @@ namespace pssalib
     {
       // Do nothing
     }
-
-//     //! Copy constructor
-//     //! All arrays get detached from source
-//     //! & are attached to this instance
-//     DataModel_PSSACR::DataModel_PSSACR(DataModel &d)
-//       : DataModel_PDM(d)
-//       , arSubvolumes_PSSACR(NULL)
-//     {
-//       // Do nothing
-//     }
 
     //! Destructor
     DataModel_PSSACR::~DataModel_PSSACR()
