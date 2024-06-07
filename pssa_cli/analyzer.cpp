@@ -14,6 +14,7 @@
  * pSSAlib Command Line Interface: Analyzer component
  */
 
+#include <set>
 #include <iostream>
 #include <boost/scoped_ptr.hpp>
 
@@ -24,12 +25,11 @@
 #include "util/Timing.h"
 #include "util/IO.hpp"
 #include "util/SimulationDataSource.hpp"
-#include "../libpssa/dependencies/sha1/sha1.h"
 
 #include "CmdLineOptions.hpp"
 using namespace pssalib::program_options;
 
-#include <boost/uuid/sha1.hpp>
+#include <boost/uuid/detail/sha1.hpp>
 
 // null stream
 pssalib::io::null_streambuf< STRING::value_type > nullBuffer;

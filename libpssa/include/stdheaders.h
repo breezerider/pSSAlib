@@ -68,6 +68,7 @@
 #include <memory>         // STL C-style pointer wrapper
 #include <atomic>         // STL atomic definitions
 #include <unordered_map>  // STL unordered map
+#include <iterator>       // STL iterators
 
 // libSBML
 #ifdef HAVE_LIBSBML
