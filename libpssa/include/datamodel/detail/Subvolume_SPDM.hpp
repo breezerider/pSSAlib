@@ -130,9 +130,10 @@ namespace detail
       Subvolume_PDM::allocate(reactions, species, dims);
 
       // allocate memory
-      m_IndexerRows = new std::size_t[species + 1]; // account for reservoir species
-      memset(m_IndexerRows, (unsigned char)0, sizeof(std::size_t)*(species + 1));
-      m_IndexerCols.reserve(species + 1, std::max(reactions / species, (UINTEGER)1));
+      UINTEGER total_species = species + 1; // account for reservoir species
+      m_IndexerRows = new std::size_t[total_species];
+      memset(m_IndexerRows, (unsigned char)0, sizeof(std::size_t)*(total_species));
+      m_IndexerCols.reserve(total_species, std::max(reactions / species, (UINTEGER)1));
     };
 
     /**
@@ -140,7 +141,7 @@ namespace detail
      */
   virtual void clear(UINTEGER reactions, UINTEGER species)
     {
-      memset(m_IndexerRows, (unsigned char)0, sizeof(std::size_t)*species);
+      memset(m_IndexerRows, (unsigned char)0, sizeof(std::size_t)*(species + 1)); // account for reservoir species
       m_IndexerCols.clear();
 
       // call base class method
@@ -173,7 +174,7 @@ namespace detail
   inline std::size_t mapRowIndex(std::size_t i)
     {
 #ifndef PSSALIB_NO_BOUNDS_CHECKS
-      if(i > unSpecies) // reservoir species
+      if(i > unSpecies) // account for reservoir species
         throw std::runtime_error("Subvolume_SPDM::mapRowIndex() - invalid arguments.");
 #endif
       return m_IndexerRows[i];
@@ -188,7 +189,7 @@ namespace detail
   inline std::size_t mapColIndex(std::size_t i, std::size_t j)
     {
 #ifndef PSSALIB_NO_BOUNDS_CHECKS
-      if((i > unSpecies)||(j >= m_IndexerCols.get_cols(m_IndexerRows[i]))) // reservoir species
+      if((i > unSpecies)||(j >= m_IndexerCols.get_cols(m_IndexerRows[i]))) // account for reservoir species
         throw std::runtime_error("Subvolume_SPDM::mapColIndex() - invalid arguments.");
 #endif
       return m_IndexerCols(m_IndexerRows[i],j);
@@ -203,7 +204,7 @@ namespace detail
   inline void moveRowUp(std::size_t & i)
     {
 #ifndef PSSALIB_NO_BOUNDS_CHECKS
-      if((i > unSpecies)) // reservoir species
+      if((i > unSpecies)) // account for reservoir species
         throw std::runtime_error("Subvolume_SPDM::moveRowUp() - invalid arguments.");
 #endif
       std::swap(m_IndexerRows[i], m_IndexerRows[i - 1]);
@@ -219,7 +220,7 @@ namespace detail
   inline void moveColLeft(std::size_t i, std::size_t & j)
     {
 #ifndef PSSALIB_NO_BOUNDS_CHECKS
-      if((i > unSpecies)||(j >= m_IndexerCols.get_cols(m_IndexerRows[i]))) // reservoir species
+      if((i > unSpecies)||(j >= m_IndexerCols.get_cols(m_IndexerRows[i]))) // account for reservoir species
         throw std::runtime_error("Subvolume_SPDM::moveColLeft() - invalid arguments.");
 #endif
       m_IndexerCols.swap(m_IndexerRows[i], j, j - 1);

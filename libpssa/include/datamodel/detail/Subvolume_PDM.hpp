@@ -131,11 +131,12 @@ namespace detail
       Subvolume::allocate(reactions, species, dims);
 
       // allocate memory
-      m_ardLambda = new REAL[species + 1];
-      memset(m_ardLambda, 0, sizeof(REAL)*(species + 1));
-      m_ardSigma = new REAL[species + 1];
-      memset(m_ardSigma, 0, sizeof(REAL)*(species + 1));
-      arPi.reserve(species + 1, std::max(reactions / species, (UINTEGER)1));
+      const UINTEGER total_species = species + 1; // account for reservoir species
+      m_ardLambda = new REAL[total_species];
+      memset(m_ardLambda, 0, sizeof(REAL)*(total_species));
+      m_ardSigma = new REAL[total_species];
+      memset(m_ardSigma, 0, sizeof(REAL)*(total_species));
+      arPi.reserve(total_species, std::max(reactions / species, (UINTEGER)1));
     };
 
     /**
@@ -143,8 +144,9 @@ namespace detail
      */
   virtual void clear(UINTEGER reactions, UINTEGER species)
     {
-      memset(m_ardLambda, (unsigned char)0, sizeof(REAL)*(species + 1));
-      memset(m_ardSigma, (unsigned char)0, sizeof(REAL)*(species + 1));
+      const UINTEGER total_species = species + 1; // account for reservoir species
+      memset(m_ardLambda, (unsigned char)0, sizeof(REAL)*(total_species));
+      memset(m_ardSigma, (unsigned char)0, sizeof(REAL)*(total_species));
       arPi.clear();
 
       // call base class method
@@ -165,7 +167,7 @@ namespace detail
   inline REAL & lambda(UINTEGER index)
     {
 #ifndef PSSALIB_NO_BOUNDS_CHECKS
-      if(index >= (unSpecies + 1))
+      if(index > unSpecies) // account for reservoir species
         throw std::runtime_error("Subvolume_PDM::lambda() - invalid arguments.");
 #endif
       return m_ardLambda[index];
@@ -180,7 +182,7 @@ namespace detail
   inline REAL & sigma(UINTEGER index)
     {
 #ifndef PSSALIB_NO_BOUNDS_CHECKS
-      if(index >= (unSpecies + 1))
+      if(index > unSpecies) // account for reservoir species
         throw std::runtime_error("Subvolume_PDM::sigma() - invalid arguments.");
 #endif
       return m_ardSigma[index];
