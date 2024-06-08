@@ -43,13 +43,13 @@ namespace sampling
           break;
       }
 
-      // FIXME no particular order is guaranteed when traversing boost::unordered_map
-      // When r =~ scale, In some cases the sum can fail for small value and reach the end without
-      // find a bin. In this case take the latest one bin
+      // FIXME no particular order is guaranteed when traversing std::unordered_map
+      // When r =~ scale, In some cases the sum can fail for small value and reach the
+      // end without finding a bin. In this case take the last bin.
       if (itB.first == itB.second)
       {
-        // It seem that boost does not support --:
-        // so reiterate c - 1
+        // It seem that unordered_map does not support --:
+        // so reiterate till c - 1
 
         ptrData->bins.getBins(itB);
 
