@@ -44,38 +44,48 @@ namespace update
   // Methods
   
   // Update per species data structures
-  void UpdateModule_PSSACR::updateSpeciesStructures(pssalib::datamodel::DataModel_PSSACR * ptrPSSACRData,
+  void UpdateModule_PSSACR::updateSpeciesStructures(pssalib::datamodel::SimulationInfo * ptrSimInfo,
+                                                    pssalib::datamodel::DataModel_PSSACR * ptrPSSACRData,
                                                     pssalib::datamodel::detail::Subvolume_PSSACR & PSSACRSubVol,
                                                     const UINTEGER index)
   {
     bool bUpdateSelf = true;
-    const REAL invMinSigma = 1.0 / PSSACRSubVol.crsdSigma.minValue;
     pssalib::datamodel::CompositionRejectionSamplerData & crsdSigma =
       PSSACRSubVol.crsdSigma;
+    const REAL invMinSigma = 1.0 / crsdSigma.minValue;
 
-    for(UINTEGER l = 0, U3_rowlen = ptrPSSACRData->arU3.get_cols(index); l < U3_rowlen; l++)
+    const UINTEGER adjusted_index = index + 1;
+
+    PSSA_TRACE(ptrSimInfo,  << "updating reactions for species index " << adjusted_index << std::endl);
+
+    for(UINTEGER l = 0, U3_rowlen = ptrPSSACRData->arU3.get_cols(adjusted_index); l < U3_rowlen; l++)
     {
-      const pssalib::datamodel::DataModel_PDM::PropensityIndex & propIdx = ptrPSSACRData->arU3(index, l);
+      const pssalib::datamodel::DataModel_PDM::PropensityIndex & propIdx = ptrPSSACRData->arU3(adjusted_index, l);
 
-      if(index == propIdx.i)
+      PSSA_TRACE(ptrSimInfo,  << "updating U3 index " << l << " propensity index = (" << propIdx.i << "," << propIdx.j << ")" << std::endl);
+
+      if(adjusted_index == propIdx.i)
         bUpdateSelf = false;
 
       // Pi
       pssalib::datamodel::CompositionRejectionSamplerData & crsdPi = PSSACRSubVol.crsdPi(propIdx.i);
       const REAL dPi = PSSACRSubVol.arPi(propIdx.i,propIdx.j);
+      PSSA_TRACE(ptrSimInfo,  << "dPi = " << dPi << ", min value = " << crsdPi.minValue << std::endl);
       crsdPi.updateValue((UINTEGER)floor(fabs(LOG2(dPi / crsdPi.minValue))) + 1, propIdx.j, dPi);
 
       // Sigma
       const REAL dSigma = PSSACRSubVol.sigma(propIdx.i);
+      PSSA_TRACE(ptrSimInfo,  << "dSigma = " << dSigma << ", inv min sigma = " << invMinSigma << std::endl);
       crsdSigma.updateValue(
         ((dSigma > 0.0) ? ((UINTEGER)floor(fabs(LOG2(dSigma * invMinSigma))) + 1) : 0), propIdx.i, dSigma);
-    }        
+    }
 
     if(bUpdateSelf)
     {
-      const REAL dSigma = PSSACRSubVol.sigma(index);
+      const REAL dSigma = PSSACRSubVol.sigma(adjusted_index);
+      PSSA_TRACE(ptrSimInfo,  << "self-update for index " << adjusted_index << ": dSigma = " << dSigma << ", inv min sigma = " << invMinSigma << std::endl);
       crsdSigma.updateValue(
-          ((dSigma > 0.0) ? ((UINTEGER)floor(fabs(LOG2(dSigma * invMinSigma))) + 1) : 0), index, dSigma);
+          ((dSigma > 0.0) ? ((UINTEGER)floor(fabs(LOG2(dSigma * invMinSigma))) + 1) : 0), adjusted_index, dSigma);
     }
   }
 
@@ -93,8 +103,8 @@ namespace update
     {
       const pssalib::datamodel::detail::SpeciesReference * sr =
         m_ptrReactionWrapper->getSpeciesReferenceAt(sri);
-      if(sr->isConstant()) continue;
-      updateSpeciesStructures(ptrPSSACRData, static_cast<pssalib::datamodel::detail::Subvolume_PSSACR &>(*m_ptrSubvolumeSrc), sr->getIndex());
+      if(sr->isReservoir()) continue;
+      updateSpeciesStructures(ptrSimInfo, ptrPSSACRData, static_cast<pssalib::datamodel::detail::Subvolume_PSSACR &>(*m_ptrSubvolumeSrc), sr->getIndex());
     }
 
     return true;
@@ -112,9 +122,9 @@ namespace update
 
     // update population
     const UINTEGER index = m_ptrReactionWrapper->getSpecies()->getIndex();
-    updateSpeciesStructures(ptrPSSACRData,
+    updateSpeciesStructures(ptrSimInfo, ptrPSSACRData,
     static_cast<pssalib::datamodel::detail::Subvolume_PSSACR &>(*m_ptrSubvolumeSrc), index);
-    updateSpeciesStructures(ptrPSSACRData,
+    updateSpeciesStructures(ptrSimInfo, ptrPSSACRData,
     static_cast<pssalib::datamodel::detail::Subvolume_PSSACR &>(*m_ptrSubvolumeDst), index);
     return true;
   }

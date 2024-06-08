@@ -116,7 +116,7 @@ namespace detail
       Subvolume_PDM::allocate(reactions, species, dims);
 
       // allocate memory
-      m_crsdPi = new CompositionRejectionSamplerData[species];
+      m_crsdPi = new CompositionRejectionSamplerData[species + 1]; // account for reservoir species
     };
 
     /**
@@ -124,7 +124,7 @@ namespace detail
      */
   virtual void clear(UINTEGER reactions, UINTEGER species)
     {
-      for(UINTEGER si = 0; si < species; ++si)
+      for(UINTEGER si = 0; si <= species; ++si)
         m_crsdPi[si].clear();
       crsdSigma.clear();
 
@@ -145,7 +145,7 @@ namespace detail
   inline CompositionRejectionSamplerData & crsdPi(UINTEGER index)
     {
 #ifndef PSSALIB_NO_BOUNDS_CHECKS
-      if(index >= unSpecies)
+      if(index > unSpecies) // account for reservoir species
         throw std::runtime_error("Subvolume_PSSACR::crsdPi() - invalid arguments.");
 #endif
       return m_crsdPi[index];

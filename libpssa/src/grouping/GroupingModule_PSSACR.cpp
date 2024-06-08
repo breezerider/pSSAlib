@@ -65,12 +65,12 @@ namespace grouping
 
     // Temporary variables
     REAL minSigma = std::numeric_limits<REAL>::max();
-    boost::scoped_array<REAL> minPi((new REAL[ptrPSRDCRData->getSpeciesCount()]));
+    boost::scoped_array<REAL> minPi(new REAL[ptrPSRDCRData->getSpeciesCount() + 1]);
 
     ////////////////////////////////////////////////
     // Calculate the minimum values
     bool bSetSigma = false;
-    for(UINTEGER si = 0, unPi; si < ptrPSRDCRData->getSpeciesCount(); ++si)
+    for(UINTEGER si = 0, unPi; si < ptrPSRDCRData->getSpeciesCount() + 1; ++si)
     {
       unPi = ptrPSRDCRData->aruL.get_cols(si);
 
@@ -84,9 +84,9 @@ namespace grouping
         pssalib::datamodel::detail::ReactionWrapper * rw = ptrPSRDCRData->aruL(si,sj);
         
         REAL temp = rw->getRate();
-        const pssalib::datamodel::detail::SpeciesReference * sr =
-          rw->getReactantsListAt(0);
-        if(sr->getIndex() == si)
+        const pssalib::datamodel::detail::SpeciesReference * sr = rw->getReactantsListAt(0);
+        const UINTEGER adjusted_index = sr->getIndex() + 1;
+        if(adjusted_index == si)
         {
           temp *= pssalib::util::getPartialCombinationsHomoreactions(sr->getStoichiometryAbs(), sr->getStoichiometryAbs());
         }
@@ -102,7 +102,7 @@ namespace grouping
         {
           bSetSigma = true;
 
-          if((sr->getIndex() == si)&&(sr->getStoichiometryAbs() > 0))
+          if((adjusted_index == si)&&(sr->getStoichiometryAbs() > 0))
             temp *= (REAL)sr->getStoichiometryAbs();
 
           if(minSigma > temp)
@@ -121,8 +121,9 @@ namespace grouping
       
       PSSACRSubVol.crsdSigma.minValue = minSigma;
       PSSACRSubVol.crsdSigma.bins.clear();
-      PSSACRSubVol.crsdSigma.bins.resize(ptrPSRDCRData->getSpeciesCount());
-      for(UINTEGER si = 0, unPi, k; si < ptrPSRDCRData->getSpeciesCount(); ++si)
+      PSSACRSubVol.crsdSigma.bins.resize(ptrPSRDCRData->getSpeciesCount() + 1);
+
+      for(UINTEGER si = 0, unPi, k; si < ptrPSRDCRData->getSpeciesCount() + 1; ++si)
       {
         PSSACRSubVol.crsdPi(si).minValue = minPi[si];
         
@@ -146,10 +147,11 @@ namespace grouping
 
           k = (UINTEGER)floor(fabs(LOG2(PSSACRSubVol.arPi(si,sj) / PSSACRSubVol.crsdPi(si).minValue))) + 1;
 
-          //k = (UINTEGER)std::floor(log2(ptrPSRDCRData->arSubvolumes_PDM[si].arPi(i,j) / ptrPSRDCRData->arSubvolumes_PSSACR[si].crsdPi[i].minValue)) + 1;
           PSSACRSubVol.crsdPi(si).bins.updateValue(k, sj, PSSACRSubVol.arPi(si,sj));
         }
       }
+
+
     }
 
     return true;
