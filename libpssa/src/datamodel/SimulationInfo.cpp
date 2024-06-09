@@ -499,12 +499,14 @@ namespace datamodel
     }
     m_unOutputIdx = 0;
     m_unOutputMax = timing::getNumTimePoints(dTimeStart, dTimeEnd, dTimeStep);
-    if(m_unOutputMax > 0) --m_unOutputMax;
 
     if(isLoggingOn(ofRawTrajectory))
       m_ptrRawTrajectory = ptrarRawPopulations + m_unSampleCurrent * m_unOutputMax * m_arSpeciesIdx.size() * m_ptrPSSA->ptrData->getSubvolumesCount();
     else
       m_ptrRawTrajectory = NULL;
+
+    // do not include intial time point
+    if(m_unOutputMax > 0) --m_unOutputMax;
 
     // reset the timing
     dTimeSimulation = 0.0;
