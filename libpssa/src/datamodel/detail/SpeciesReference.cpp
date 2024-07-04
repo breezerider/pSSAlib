@@ -77,11 +77,11 @@ namespace detail
     {
       STRINGSTREAM ssTemp;
       ssTemp << getStoichiometryAbs() << " * ";
-      if(NULL != m_ptrReaction)
-        if(PSSALIB_SPECIES_ID_RESERVOIR == m_unSpeciesIndex)
+      if(NULL != getReaction())
+        if(isReservoir())
           ssTemp << "[ ]";
         else
-          ssTemp << m_ptrReaction->getModel()->getSpecies(getIndex())->toString();
+          ssTemp << getReaction()->getModel()->getSpecies(getIndex())->toString();
       else
         ssTemp << Base::toString();
       return ssTemp.str();

@@ -44,7 +44,10 @@ namespace detail
     {
       m_arSpeciesRefs = new SpeciesReference[m_unSpeciesRefsCount];
       for(UINTEGER i = 0; i < m_unSpeciesRefsCount; ++i)
+      {
         m_arSpeciesRefs[i] = right.m_arSpeciesRefs[i];
+        m_arSpeciesRefs[i].setReaction(this);
+      }
     }
   }
 
@@ -357,6 +360,8 @@ namespace detail
     if(NULL != m_arSpeciesRefs)
       delete [] m_arSpeciesRefs;
     m_arSpeciesRefs = new SpeciesReference[m_unSpeciesRefsCount];
+    for(UINTEGER i = 0; i < m_unSpeciesRefsCount; ++i)
+      m_arSpeciesRefs[i].setReaction(this);
   }
 
   /*

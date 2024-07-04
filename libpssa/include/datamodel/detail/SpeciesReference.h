@@ -60,7 +60,7 @@ namespace detail
     //! species stoichiometry
     BYTE m_ucSpeciesStoichiometry;
 
-    //! Pointer to parent
+    //! pointer to parent reaction
     Reaction * m_ptrReaction;
 
   /////////////////////////////////////
@@ -174,6 +174,26 @@ namespace detail
   inline void setIndex(const UINTEGER index)
     {
       m_unSpeciesIndex = index;
+    };
+
+    /**
+     * Get the pointer to parent reaction.
+     *
+     * @return current value.
+     */
+  inline const Reaction * getReaction() const
+    {
+      return m_ptrReaction;
+    };
+
+    /**
+     * Set the pointer to parent reaction.
+     *
+     * @param reaction new value.
+     */
+  inline void setReaction(Reaction * const reaction)
+    {
+      m_ptrReaction = reaction;
     };
 
     /**
